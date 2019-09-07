@@ -75,6 +75,15 @@ _controller.setSelectionStyle((currentStyle) {
 SpannbleStyle style = _controller.getSelectionStyle();
 ```
 
+* Control composing style
+
+```dart
+var newStyle = _controller.composingStyle;
+// Set bold
+newStyle.setStyle(styleBold);
+_controller.composingStyle = newStyle;
+```
+
 > Can use predefined StyleToolbar widget
 
 ```dart
