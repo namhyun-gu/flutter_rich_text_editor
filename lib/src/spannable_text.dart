@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:rich_text_editor/diff_patch_match/DiffMatchPatch.dart';
 
@@ -7,8 +9,15 @@ import 'spannable_style.dart';
 typedef SetStyleCallback = SpannableStyle Function(SpannableStyle style);
 
 class SpannableTextEditingController extends TextEditingController {
+  static const historyMaxLength = 5;
+
   SpannableList currentStyleList;
   SpannableStyle currentComposingStyle;
+
+  Queue<ControllerHistory> _histories = Queue();
+  Queue<ControllerHistory> _undoHistories = Queue();
+
+  bool _updatedByHistory = false;
 
   SpannableTextEditingController({
     String text = '',
@@ -22,7 +31,12 @@ class SpannableTextEditingController extends TextEditingController {
   @override
   set value(TextEditingValue newValue) {
     if (value.text != newValue.text) {
-      _updateList(value.text, newValue.text);
+      if (!_updatedByHistory) {
+        _updateHistories(_histories);
+        _undoHistories.clear();
+        _updateList(value.text, newValue.text);
+      }
+      _updatedByHistory = false;
     }
     super.value = newValue;
   }
@@ -41,6 +55,7 @@ class SpannableTextEditingController extends TextEditingController {
 
   void setSelectionStyle(SetStyleCallback callback) {
     if (selection.isValid && selection.isNormalized) {
+      _updateHistories(_histories);
       for (var offset = selection.start; offset < selection.end; offset++) {
         currentStyleList.modify(offset, callback);
       }
@@ -60,6 +75,42 @@ class SpannableTextEditingController extends TextEditingController {
       return style;
     }
     return null;
+  }
+
+  void clearComposingStyle() {
+    currentComposingStyle = SpannableStyle();
+  }
+
+  bool canUndo() => _histories.isNotEmpty;
+
+  void undo() {
+    assert(canUndo());
+    _updateHistories(_undoHistories);
+    _applyHistory(_histories.removeLast());
+  }
+
+  bool canRedo() => _undoHistories.isNotEmpty;
+
+  void redo() {
+    assert(canRedo());
+    _updateHistories(_histories);
+    _applyHistory(_undoHistories.removeLast());
+  }
+
+  void _applyHistory(ControllerHistory history) {
+    _updatedByHistory = true;
+    currentStyleList = history.styleList;
+    value = history.value;
+  }
+
+  void _updateHistories(Queue<ControllerHistory> histories) {
+    if (histories.length == historyMaxLength) {
+      histories.removeFirst();
+    }
+    histories.add(ControllerHistory(
+      value: value,
+      styleList: currentStyleList.copy(),
+    ));
   }
 
   void _updateList(String oldText, String newText) {
@@ -134,9 +185,21 @@ class SpannableTextEditingController extends TextEditingController {
       return null;
     }
   }
+}
 
-  void clearComposingStyle() {
-    currentComposingStyle = SpannableStyle();
+@immutable
+class ControllerHistory {
+  final TextEditingValue value;
+  final SpannableList styleList;
+
+  ControllerHistory({
+    this.value,
+    this.styleList,
+  });
+
+  @override
+  String toString() {
+    return '_ControllerHistory(text: ${value.text}, styleList: $styleList)';
   }
 }
 

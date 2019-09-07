@@ -8,15 +8,11 @@ import 'spannable_style.dart';
 typedef ModifyCallback = SpannableStyle Function(SpannableStyle style);
 
 class SpannableList {
-  List<SpannableStyle> _list = <SpannableStyle>[];
+  List<SpannableStyle> _list;
 
   List<SpannableStyle> get list => _list;
 
-  SpannableList();
-
-  SpannableList.fromList(List<int> list) {
-    _list = list.map((e) => SpannableStyle(value: e)).toList();
-  }
+  SpannableList(List<SpannableStyle> list) : _list = list ?? <SpannableStyle>[];
 
   SpannableList.fromJson(String jsonContent) {
     var list = json.decode(jsonContent);
@@ -41,6 +37,10 @@ class SpannableList {
 
   void concat(SpannableList anotherList) {
     _list.addAll(anotherList.list);
+  }
+
+  SpannableList copy() {
+    return SpannableList(_list.map((e) => e.copy()).toList());
   }
 
   void clear() => _list.clear();
@@ -135,7 +135,7 @@ class SpannableList {
 
   @override
   String toString() {
-    return 'SpannableList{_list: $_list}';
+    return '$runtimeType(_list: $_list)';
   }
 }
 

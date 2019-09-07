@@ -61,7 +61,7 @@ class SpannableStyle {
 
   @override
   String toString() {
-    return '$runtimeType(_value: $_value)';
+    return _value.toString();
   }
 }
 

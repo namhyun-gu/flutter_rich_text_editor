@@ -47,10 +47,30 @@ class _StyleToolbarState extends State<StyleToolbar> {
           }
         }
         return Row(
-          children: _buildActions(
-            currentStyle ?? SpannableStyle(),
-            currentSelection,
-          ),
+          children: [
+            ..._buildActions(
+              currentStyle ?? SpannableStyle(),
+              currentSelection,
+            ),
+            IconButton(
+              icon: Icon(Icons.undo),
+              onPressed: widget.controller.canUndo()
+                  ? () {
+                      widget.controller.undo();
+                      FocusScope.of(context).unfocus();
+                    }
+                  : null,
+            ),
+            IconButton(
+              icon: Icon(Icons.redo),
+              onPressed: widget.controller.canRedo()
+                  ? () {
+                      widget.controller.redo();
+                      FocusScope.of(context).unfocus();
+                    }
+                  : null,
+            ),
+          ],
         );
       },
     );

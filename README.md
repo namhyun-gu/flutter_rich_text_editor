@@ -12,7 +12,8 @@ Must be use flutter **v1.8.3** or later, Dart 2.2.2 or later
 
 ```yaml
 rich_text_editor:
-    git: git:github.com:namhyun-gu/flutter_rich_text_editor.git
+  git:
+    url: https://github.com/namhyun-gu/flutter_rich_text_editor
 ```
 
 ## Using
@@ -28,10 +29,10 @@ import 'package:rich_text_editor/rich_text_editor.dart';
 > SpannableTextEditingController is extends TextEditingController. Therefore you can use TextEditingController interfaces.
 
 ```dart
-SpannableTextEditingController _controller = SpannableTextEditingController();
+SpannableTextEditingController controller = SpannableTextEditingController();
 
 // Initialize with saved text (No style applied)
-SpannableTextEditingController _controller = SpannableTextEditingController(
+SpannableTextEditingController controller = SpannableTextEditingController(
   text: "Hello",
 );
 
@@ -39,7 +40,7 @@ SpannableTextEditingController _controller = SpannableTextEditingController(
 String savedStyleJson;
 SpannableList styleList = SpannableList.fromJson(savedStyleJson); 
 
-SpannableTextEditingController _controller = SpannableTextEditingController(
+SpannableTextEditingController controller = SpannableTextEditingController(
   text: "Hello",
   styleList: styleList
 );
@@ -49,7 +50,7 @@ SpannableTextEditingController _controller = SpannableTextEditingController(
 
 ```dart
 TextField(
-  controller: _controller,
+  controller: controller,
   keyboardType: TextInputType.multiline,
   maxLines: null,
   decoration: InputDecoration(
@@ -64,7 +65,7 @@ TextField(
 
 ```dart
 // Set selection style
-_controller.setSelectionStyle((currentStyle) {
+controller.setSelectionStyle((currentStyle) {
   var newStyle = currentStyle;
   // Set bold
   newStyle.setStyle(styleBold);
@@ -72,24 +73,36 @@ _controller.setSelectionStyle((currentStyle) {
 });
 
 // Get selection style
-SpannbleStyle style = _controller.getSelectionStyle();
+SpannbleStyle style = controller.getSelectionStyle();
 ```
 
 * Control composing style
 
 ```dart
-var newStyle = _controller.composingStyle;
+var newStyle = controller.composingStyle;
 // Set bold
 newStyle.setStyle(styleBold);
-_controller.composingStyle = newStyle;
+controller.composingStyle = newStyle;
 ```
 
 > Can use predefined StyleToolbar widget
 
 ```dart
 StyleToolbar(
-  controller: _controller,
+  controller: controller,
 ),
+```
+
+* Undo & Redo operation
+
+```dart
+// Undo
+controller.canUndo();
+controller.undo();
+
+// Redo
+controller.canRedo();
+controller.redo();
 ```
 
 * Save style list
@@ -97,7 +110,7 @@ StyleToolbar(
 > Currently not support standard rich text format. can use json type list only.
 
 ```dart
-_controller.currentStyleList.toJson()
+controller.currentStyleList.toJson()
 ```
 
 * Use style list to RichText widget
