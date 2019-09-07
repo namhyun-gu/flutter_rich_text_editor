@@ -1,8 +1,0 @@
-name: diff_match_patch
-description: Diff Match Patch is a high-performance library in multiple languages that manipulates plain text. 
-version: 0.0.1
-author: Google
-homepage: https://github.com/google/diff-match-patch
-
-environment:
-  sdk: ">=2.1.0 <3.0.0"

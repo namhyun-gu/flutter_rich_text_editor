@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  diff_match_patch:
-    path: packages/diff_match_patch
 
 dev_dependencies:
   flutter_test:

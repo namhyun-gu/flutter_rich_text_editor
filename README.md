@@ -6,6 +6,15 @@ Rich text editor for flutter
 
 Must be use flutter **v1.8.3** or later, Dart 2.2.2 or later
 
+## Getting Started
+
+* Add this lines to pubspec.yaml
+
+```yaml
+rich_text_editor:
+    git: git:github.com:namhyun-gu/flutter_rich_text_editor.git
+```
+
 ## Using
 
 * Import library 
