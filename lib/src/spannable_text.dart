@@ -11,8 +11,8 @@ typedef SetStyleCallback = SpannableStyle Function(SpannableStyle style);
 class SpannableTextEditingController extends TextEditingController {
   static const historyMaxLength = 5;
 
-  SpannableList currentStyleList;
-  SpannableStyle currentComposingStyle;
+  SpannableList _currentStyleList;
+  SpannableStyle _currentComposingStyle;
 
   Queue<ControllerHistory> _histories = Queue();
   Queue<ControllerHistory> _undoHistories = Queue();
@@ -24,8 +24,18 @@ class SpannableTextEditingController extends TextEditingController {
     SpannableList styleList,
     SpannableStyle composingStyle,
   }) : super(text: text) {
-    currentStyleList = styleList ?? SpannableList.generate(text.length);
-    currentComposingStyle = composingStyle ?? SpannableStyle();
+    _currentStyleList = styleList ?? SpannableList.generate(text.length);
+    _currentComposingStyle = composingStyle ?? SpannableStyle();
+  }
+
+  SpannableTextEditingController.fromJson({
+    String text = '',
+    String styleJson,
+    SpannableStyle composingStyle,
+  }) : super(text: text) {
+    _currentStyleList = SpannableList.fromJson(styleJson) ??
+        SpannableList.generate(text.length);
+    _currentComposingStyle = composingStyle ?? SpannableStyle();
   }
 
   @override
@@ -43,13 +53,15 @@ class SpannableTextEditingController extends TextEditingController {
 
   @override
   TextSpan buildTextSpan({TextStyle style, bool withComposing}) {
-    return currentStyleList.toTextSpan(text, defaultStyle: style);
+    return _currentStyleList.toTextSpan(text, defaultStyle: style);
   }
 
-  SpannableStyle get composingStyle => currentComposingStyle.copy();
+  SpannableList get styleList => _currentStyleList.copy();
+
+  SpannableStyle get composingStyle => _currentComposingStyle.copy();
 
   set composingStyle(SpannableStyle newComposingStyle) {
-    currentComposingStyle = newComposingStyle;
+    _currentComposingStyle = newComposingStyle;
     notifyListeners();
   }
 
@@ -57,7 +69,7 @@ class SpannableTextEditingController extends TextEditingController {
     if (selection.isValid && selection.isNormalized) {
       _updateHistories(_histories);
       for (var offset = selection.start; offset < selection.end; offset++) {
-        currentStyleList.modify(offset, callback);
+        _currentStyleList.modify(offset, callback);
       }
       notifyListeners();
     }
@@ -67,7 +79,7 @@ class SpannableTextEditingController extends TextEditingController {
     if (selection.isValid && selection.isNormalized) {
       SpannableStyle style = SpannableStyle();
       for (var offset = selection.start; offset < selection.end; offset++) {
-        final current = currentStyleList.index(offset);
+        final current = _currentStyleList.index(offset);
         style.setStyle(style.style | current.style);
         style.clearForegroundColor();
         style.clearBackgroundColor();
@@ -78,7 +90,7 @@ class SpannableTextEditingController extends TextEditingController {
   }
 
   void clearComposingStyle() {
-    currentComposingStyle = SpannableStyle();
+    _currentComposingStyle = SpannableStyle();
   }
 
   bool canUndo() => _histories.isNotEmpty;
@@ -99,7 +111,7 @@ class SpannableTextEditingController extends TextEditingController {
 
   void _applyHistory(ControllerHistory history) {
     _updatedByHistory = true;
-    currentStyleList = history.styleList;
+    _currentStyleList = history.styleList;
     value = history.value;
   }
 
@@ -109,7 +121,7 @@ class SpannableTextEditingController extends TextEditingController {
     }
     histories.add(ControllerHistory(
       value: value,
-      styleList: currentStyleList.copy(),
+      styleList: _currentStyleList.copy(),
     ));
   }
 
@@ -123,9 +135,9 @@ class SpannableTextEditingController extends TextEditingController {
 
       for (var index = 0; index < textChange.length; index++) {
         if (textChange.operation == Operation.insert) {
-          currentStyleList.insert(textChange.offset + index, style);
+          _currentStyleList.insert(textChange.offset + index, style);
         } else if (textChange.operation == Operation.delete) {
-          currentStyleList.delete(textChange.offset);
+          _currentStyleList.delete(textChange.offset);
         }
       }
     }

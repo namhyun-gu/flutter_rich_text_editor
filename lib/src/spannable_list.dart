@@ -14,10 +14,13 @@ class SpannableList {
 
   SpannableList(List<SpannableStyle> list) : _list = list ?? <SpannableStyle>[];
 
-  SpannableList.fromJson(String jsonContent) {
-    var list = json.decode(jsonContent);
-    var decodedList = list.map((e) => SpannableStyle(value: e)).toList();
-    _list = decodedList.cast<SpannableStyle>();
+  factory SpannableList.fromJson(String styleJson) {
+    if (styleJson.isNotEmpty) {
+      var list = json.decode(styleJson);
+      var decodedList = list.map((e) => SpannableStyle(value: e)).toList();
+      return SpannableList(decodedList.cast<SpannableStyle>());
+    }
+    return null;
   }
 
   SpannableList.generate(int length) {

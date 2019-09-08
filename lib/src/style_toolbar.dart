@@ -43,7 +43,7 @@ class _StyleToolbarState extends State<StyleToolbar> {
             currentSelection = selection;
             currentStyle = widget.controller.getSelectionStyle();
           } else {
-            currentStyle = widget.controller.currentComposingStyle;
+            currentStyle = widget.controller.composingStyle;
           }
         }
         return Row(

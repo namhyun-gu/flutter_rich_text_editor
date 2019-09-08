@@ -38,11 +38,18 @@ SpannableTextEditingController controller = SpannableTextEditingController(
 
 // Initialize with saved text and style
 String savedStyleJson;
-SpannableList styleList = SpannableList.fromJson(savedStyleJson); 
 
+SpannableList styleList = SpannableList.fromJson(savedStyleJson); 
 SpannableTextEditingController controller = SpannableTextEditingController(
   text: "Hello",
   styleList: styleList
+);
+
+// or
+
+SpannableTextEditingController controller = SpannableTextEditingController.fromJson(
+  text: "Hello",
+  styleJson: savedStyleJson
 );
 ```
 
@@ -61,7 +68,7 @@ TextField(
 )
 ```
 
-* Control Selection style
+* Control selection style
 
 ```dart
 // Set selection style
@@ -110,7 +117,7 @@ controller.redo();
 > Currently not support standard rich text format. can use json type list only.
 
 ```dart
-controller.currentStyleList.toJson()
+controller.styleList.toJson();
 ```
 
 * Use style list to RichText widget
