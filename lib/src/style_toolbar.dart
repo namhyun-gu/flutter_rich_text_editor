@@ -2,8 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'color_picker.dart';
 import 'spannable_style.dart';
 import 'spannable_text.dart';
+
+const defaultColors = [
+  null,
+  Colors.red,
+  Colors.redAccent,
+  Colors.orange,
+  Colors.orangeAccent,
+  Colors.yellow,
+  Colors.yellowAccent,
+  Colors.green,
+  Colors.greenAccent,
+  Colors.blue,
+  Colors.blueAccent,
+  Colors.indigo,
+  Colors.indigoAccent,
+  Colors.purple,
+  Colors.purpleAccent,
+  Colors.grey,
+];
 
 class StyleToolbar extends StatefulWidget {
   final SpannableTextEditingController controller;
@@ -34,7 +54,7 @@ class _StyleToolbarState extends State<StyleToolbar> {
     return StreamBuilder<TextEditingValue>(
       stream: _streamController.stream,
       builder: (context, snapshot) {
-        var currentStyle;
+        var currentStyle = SpannableStyle();
         var currentSelection;
         if (snapshot.hasData) {
           var value = snapshot.data;
@@ -51,6 +71,29 @@ class _StyleToolbarState extends State<StyleToolbar> {
             ..._buildActions(
               currentStyle ?? SpannableStyle(),
               currentSelection,
+            ),
+            IconButton(
+              icon: Icon(Icons.format_color_text),
+              onPressed: () async {
+                FocusScope.of(context).unfocus();
+                ColorSelection colorSelection = await showModalBottomSheet(
+                  context: context,
+                  builder: (context) => ColorPicker(
+                    colors: defaultColors,
+                    selectionColor: getColorFromValue(
+                      currentStyle.foregroundColor,
+                    ),
+                  ),
+                );
+                if (colorSelection != null) {
+                  _setTextColor(
+                    currentStyle ?? SpannableStyle(),
+                    useForegroundColor,
+                    colorSelection,
+                    selection: currentSelection,
+                  );
+                }
+              },
             ),
             IconButton(
               icon: Icon(Icons.undo),
@@ -128,6 +171,40 @@ class _StyleToolbarState extends State<StyleToolbar> {
             .setSelectionStyle((style) => style..setStyle(textStyle));
       } else {
         widget.controller.composingStyle = spannableStyle..setStyle(textStyle);
+      }
+    }
+  }
+
+  void _setTextColor(
+    SpannableStyle spannableStyle,
+    int textStyle,
+    ColorSelection colorSelection, {
+    TextSelection selection,
+  }) {
+    bool hasSelection = selection != null;
+    if (hasSelection) {
+      if (textStyle == useForegroundColor) {
+        if (colorSelection.color != null) {
+          widget.controller.selection = selection;
+          widget.controller.setSelectionStyle(
+            (style) => style..setForegroundColor(colorSelection.color),
+          );
+        } else {
+          widget.controller.selection = selection;
+          widget.controller.setSelectionStyle(
+            (style) => style..clearForegroundColor(),
+          );
+        }
+      }
+    } else {
+      if (textStyle == useForegroundColor) {
+        if (colorSelection.color != null) {
+          widget.controller.composingStyle = spannableStyle
+            ..setForegroundColor(colorSelection.color);
+        } else {
+          widget.controller.composingStyle = spannableStyle
+            ..clearForegroundColor();
+        }
       }
     }
   }

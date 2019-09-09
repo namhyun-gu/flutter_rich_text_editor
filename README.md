@@ -134,13 +134,18 @@ RichText(
 
 * Use SpannableStyle
 
-> Current support styles : styleBold, styleItalic, styleUnderline, styleLineThrough
-
 ```dart
+// Font styles
 var style = SpannableStyle();
 
 style.setStyle(styleBold);
 style.hasStyle(styleBold); // true
 style.clearStyle(styleBold);
 style.hasStyle(styleBold); // false
+
+// Text foreground color
+Color color = Colors.red;
+
+style.setForegroundColor(color);
+style.clearForegroundColor();
 ```

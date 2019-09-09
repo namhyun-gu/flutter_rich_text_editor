@@ -78,11 +78,34 @@ class SpannableTextEditingController extends TextEditingController {
   SpannableStyle getSelectionStyle() {
     if (selection.isValid && selection.isNormalized) {
       SpannableStyle style = SpannableStyle();
-      for (var offset = selection.start; offset < selection.end; offset++) {
+
+      var start = selection.start;
+      var end = selection.end;
+      var first = _currentStyleList.index(start);
+
+      var foregroundColor =
+          first.hasStyle(useForegroundColor) ? first.foregroundColor : null;
+      var backgroundColor =
+          first.hasStyle(useBackgroundColor) ? first.backgroundColor : null;
+
+      for (var offset = start; offset < end; offset++) {
         final current = _currentStyleList.index(offset);
         style.setStyle(style.style | current.style);
-        style.clearForegroundColor();
-        style.clearBackgroundColor();
+
+        if (foregroundColor != null &&
+            foregroundColor != current.foregroundColor) {
+          foregroundColor = null;
+        }
+        if (backgroundColor != null &&
+            backgroundColor != current.backgroundColor) {
+          backgroundColor = null;
+        }
+      }
+      if (foregroundColor != null) {
+        style.setForegroundColor(getColorFromValue(foregroundColor));
+      }
+      if (backgroundColor != null) {
+        style.setBackgroundColor(getColorFromValue(backgroundColor));
       }
       return style;
     }

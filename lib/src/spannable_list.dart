@@ -80,20 +80,12 @@ class SpannableList {
 
     var foregroundColor;
     if (style.hasStyle(useForegroundColor)) {
-      var color = style.foregroundColor;
-      var r = SpannableStyleUtils.getColorRed(color);
-      var g = SpannableStyleUtils.getColorGreen(color);
-      var b = SpannableStyleUtils.getColorBlue(color);
-      foregroundColor = Color.fromARGB(255, r, g, b);
+      foregroundColor = getColorFromValue(style.foregroundColor);
     }
 
     var backgroundColor;
     if (style.hasStyle(useBackgroundColor)) {
-      var color = style.backgroundColor;
-      var r = SpannableStyleUtils.getColorRed(color);
-      var g = SpannableStyleUtils.getColorGreen(color);
-      var b = SpannableStyleUtils.getColorBlue(color);
-      backgroundColor = Color.fromARGB(255, r, g, b);
+      backgroundColor = getColorFromValue(style.backgroundColor);
     }
 
     return TextStyle(
