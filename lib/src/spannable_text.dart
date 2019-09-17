@@ -150,17 +150,16 @@ class SpannableTextEditingController extends TextEditingController {
 
   void _updateList(String oldText, String newText) {
     var textChange = _calculateTextChange(oldText, newText);
-    if (textChange != null) {
-      var style;
-      if (textChange.operation == Operation.insert) {
-        style = (composingStyle ?? SpannableStyle()).copy();
-      }
-
-      for (var index = 0; index < textChange.length; index++) {
-        if (textChange.operation == Operation.insert) {
-          _currentStyleList.insert(textChange.offset + index, style);
-        } else if (textChange.operation == Operation.delete) {
-          _currentStyleList.delete(textChange.offset);
+    var diffLength = (oldText.length - newText.length).abs();
+    if (textChange != null && diffLength > 0) {
+      var composedStyle = (composingStyle ?? SpannableStyle()).copy();
+      if (diffLength > 0) {
+        for (var index = 0; index < diffLength; index++) {
+          if (textChange.operation == Operation.insert) {
+            _currentStyleList.insert(textChange.offset + index, composedStyle);
+          } else if (textChange.operation == Operation.delete) {
+            _currentStyleList.delete(textChange.offset);
+          }
         }
       }
     }
