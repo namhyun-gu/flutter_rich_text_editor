@@ -9,7 +9,7 @@ import 'spannable_style.dart';
 typedef SetStyleCallback = SpannableStyle Function(SpannableStyle style);
 
 class SpannableTextEditingController extends TextEditingController {
-  static const historyMaxLength = 5;
+  final int historyLength;
 
   SpannableList _currentStyleList;
   SpannableStyle _currentComposingStyle;
@@ -23,6 +23,7 @@ class SpannableTextEditingController extends TextEditingController {
     String text = '',
     SpannableList styleList,
     SpannableStyle composingStyle,
+    this.historyLength = 5,
   }) : super(text: text) {
     _currentStyleList = styleList ?? SpannableList.generate(text.length);
     _currentComposingStyle = composingStyle ?? SpannableStyle();
@@ -32,6 +33,7 @@ class SpannableTextEditingController extends TextEditingController {
     String text = '',
     String styleJson,
     SpannableStyle composingStyle,
+    this.historyLength = 5,
   }) : super(text: text) {
     _currentStyleList = SpannableList.fromJson(styleJson) ??
         SpannableList.generate(text.length);
@@ -139,7 +141,7 @@ class SpannableTextEditingController extends TextEditingController {
   }
 
   void _updateHistories(Queue<ControllerHistory> histories) {
-    if (histories.length == historyMaxLength) {
+    if (histories.length == historyLength) {
       histories.removeFirst();
     }
     histories.add(ControllerHistory(
