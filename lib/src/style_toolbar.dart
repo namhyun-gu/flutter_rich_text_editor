@@ -73,7 +73,10 @@ class _StyleToolbarState extends State<StyleToolbar> {
               currentSelection,
             ),
             IconButton(
-              icon: Icon(Icons.format_color_text),
+              icon: Icon(
+                Icons.format_color_text,
+                color: getColorFromValue(currentStyle.foregroundColor),
+              ),
               onPressed: () async {
                 FocusScope.of(context).unfocus();
                 ColorSelection colorSelection = await showModalBottomSheet(
